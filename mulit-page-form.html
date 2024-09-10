@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Step Form</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        .form-container {
+            background: #fff;
+            padding: 15px; /* Reduced padding for less space inside the form */
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); /* Increased box shadow for a more pronounced effect */
+            width: 100%;
+            max-width: 600px;
+            min-height: 300px; /* Adjusted min-height */
+            margin: 0; /* Remove default margin */
+        }
+
+        .progress-container {
+            margin-bottom: 20px; /* Space between progress bar and the step heading */
+        }
+
+        .step-info {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .step-info span {
+            margin-right: 5px;
+        }
+
+        .step-number {
+            margin-right: 5px;
+        }
+
+        .step-of {
+            margin: 0 5px;
+        }
+
+        .total-steps {
+            color: #4caf50;
+        }
+
+        .progress-bar {
+            background-color: #ddd;
+            height: 10px;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .progress-fill {
+            background-color: #4caf50;
+            height: 100%;
+            width: 0;
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .required {
+            color: red;
+            font-size: 14px;
+            margin-left: 3px; /* Reduced spacing between the label and the asterisk */
+        }
+
+        .name-fields {
+            display: flex;
+            gap: 15px; /* Space between the fields */
+            margin-bottom: 15px;
+        }
+
+        .name-field {
+            flex: 1; /* Ensures that each field takes up equal space */
+        }
+
+        input,
+        textarea {
+            width: 100%; /* Full width for input and textarea */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px; /* Space between fields and button */
+        }
+
+        .field-label {
+            display: block;
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        button {
+            background-color: #4caf50; /* Default button color */
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button.next-btn {
+            width: auto;
+            margin-left: 0;
+            padding: 8px 16px; /* Adjust padding for smaller width */
+            background-color: #007bff; /* Blue background for the "Next" button */
+            text-align: left; /* Left-aligns the text inside the button */
+        }
+
+        button:hover {
+            background-color: #0056b3; /* Darker blue for hover effect */
+        }
+
+        .form-step:last-of-type button {
+            margin-bottom: 0; /* Remove extra space below the submit button */
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="progress-container">
+            <div class="step-info">
+                <span class="step-number">Step 1</span>
+                <span class="step-of">of</span>
+                <span class="total-steps">3</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+        <form id="multiStepForm">
+            <!-- Step 1 -->
+            <div class="form-step form-step-1 active">
+                <h2>Name <span class="required">*</span></h2>
+                <div class="name-fields">
+                    <div class="name-field">
+                        <input type="text" id="firstName" name="firstName" required>
+                        <label for="firstName" class="field-label">First</label>
+                    </div>
+                    <div class="name-field">
+                        <input type="text" id="lastName" name="lastName" required>
+                        <label for="lastName" class="field-label">Last</label>
+                    </div>
+                </div>
+                <button type="button" class="next-btn">Next</button>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="form-step form-step-2">
+                <h2>Email <span class="required">*</span></h2>
+                <input type="email" id="email" name="email" required>
+                <button type="button" class="next-btn">Next</button>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="form-step form-step-3">
+                <h2>Comments or Message <span class="required">*</span></h2>
+                <textarea id="comment" name="comment" rows="4" required></textarea>
+                <button type="button" class="next-btn">Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const steps = document.querySelectorAll('.form-step');
+        const nextBtns = document.querySelectorAll('.next-btn');
+        const stepInfo = document.querySelector('.step-info');
+        const progressFill = document.querySelector('.progress-fill');
+        let currentStep = 0;
+
+        nextBtns.forEach((btn, idx) => {
+            btn.addEventListener('click', () => {
+                steps[currentStep].classList.remove('active');
+                currentStep++;
+                steps[currentStep].classList.add('active');
+                updateStepInfo();
+                updateProgressBar();
+            });
+        });
+
+        function updateStepInfo() {
+            const stepNumber = currentStep + 1;
+            stepInfo.querySelector('.step-number').textContent = `Step ${stepNumber}`;
+        }
+
+        function updateProgressBar() {
+            const progressPercent = ((currentStep + 1) / steps.length) * 100;
+            progressFill.style.width = `${progressPercent}%`;
+        }
+
+        // Initialize the progress bar
+        updateProgressBar();
+    </script>
+</body>
+</html>
